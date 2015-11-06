@@ -1,0 +1,13 @@
+{
+  "name": "TwittnukerPushServer2",
+  "description": "Twittnuker Push Notification Server",
+  "version": "0.0.1",
+  "dependencies": {
+    "node-gcm": "0.12.0",
+    "twit": "2.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
