@@ -85,17 +85,25 @@ app.post('/register', function(req, res) {
     var token = req.body.token;
     var twitterUserId = req.body.userId;
 
-    var isConfigured = false;
-    twitter.instances.forEach(function(instance) {
-        if (instance.userId == twitterUserId) isConfigured = true;
-    });
-    if (isConfigured && !db('tokens').find({ token: token })) {
-        db('tokens').push({token: token});
-    }
-    updateTwitterInstances();
+    console.log('Register: ' + token);
 
-    res.set('Content-Type', 'application/json');
-    res.send('{ "status": "Ok" }');
+    //Wait 5s -
+    setTimeout(function() {
+        var isConfigured = false;
+        twitter.instances.forEach(function(instance) {
+            if (instance.userId == twitterUserId) isConfigured = true;
+        });
+        if (isConfigured && !db('tokens').find({ token: token })) {
+            db('tokens').push({token: token});
+            updateTwitterInstances();
+
+            res.set('Content-Type', 'application/json');
+            res.send('{ "status": "Ok" }');
+        } else {
+            res.set('Content-Type', 'application/json');
+            res.send('{ "status": "Failed" }');
+        }
+    }, 5000);
 });
 
 /**
@@ -104,6 +112,9 @@ app.post('/register', function(req, res) {
  */
 app.post('/remove', function(req, res) {
     var token = req.body.token;
+
+    console.log('Remove: ' + token);
+
     db('tokens').remove({ token: token });
     updateTwitterInstances();
 
