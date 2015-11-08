@@ -1,4 +1,5 @@
 var express = require('express'),
+    bodyParser = require('body-parser'),
     twit = require('twit'),
     lowdb = require('lowdb'),
     streamhandler = require('./handler');
@@ -18,6 +19,8 @@ try {
 
 var app = express();
 
+app.use(bodyParser.urlencoded({ extended: false }));
+
 var db = lowdb('db.json');
 
 var twitter = {
@@ -27,9 +30,11 @@ var twitter = {
 var initTwitterInstances = function() {
     if (config.twitter.length == 0) {
         console.error("No Twitter configurations. Please edit config.js accordingly!");
+        return;
     }
     else if (db('tokens').size() == 0) {
-        console.info("No device registered. Please setup Twittnuker to receive Push Notifications from this server!")
+        console.info("No device registered. Please setup Twittnuker to receive Push Notifications from this server!");
+        return;
     }
 
     config.twitter.forEach(function(profile) {
@@ -78,8 +83,8 @@ app.get('/', function(req, res) {
  * Adds a token to the database if the given Twitter user id is configured
  */
 app.post('/register', function(req, res) {
-    var token = res.params.token;
-    var twitterUserId = res.params.userId;
+    var token = req.body.token;
+    var twitterUserId = req.body.userId;
 
     var isConfigured = false;
     twitter.instances.forEach(function(instance) {
@@ -99,7 +104,7 @@ app.post('/register', function(req, res) {
  * Remove token from database
  */
 app.post('/remove', function(req, res) {
-    var token = res.params.token;
+    var token = req.body.token;
     db('tokens').remove({ token: token });
     updateTwitterInstances();
 

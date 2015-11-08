@@ -139,9 +139,7 @@ module.exports = {
             var regIds = db('tokens').pluck('token');
             sender.send(message, { registrationIds: regIds }, function(err, result) {
                 if (err) console.error(err);
-                else     console.log(result);
-
-
+                //else     console.log(result);
             });
         };
     }
