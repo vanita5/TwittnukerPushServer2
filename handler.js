@@ -1,12 +1,14 @@
 var gcm = require('node-gcm'),
     config = require('./config'),
-    lowdb = require('lowdb');
+    lowdb = require('lowdb'),
+    Entities = require('html-entities').AllHtmlEntities;
 
 module.exports = {
     streamHandler: function(stream, userId) {
 
         var db = lowdb('db.json');
         var sender = new gcm.Sender(config.gcm.api_key);
+        var entities = new Entities();
 
         stream.on('tweet', function(status) {
             if (isMyRetweet(status, userId)) {
@@ -15,7 +17,7 @@ module.exports = {
                     userId,
                     status.user.screen_name,
                     'type_retweet',
-                    status.retweeted_status.text,
+                    entities.decode(status.retweeted_status.text),
                     status.user.profile_image_url
                 );
             }
@@ -25,7 +27,7 @@ module.exports = {
                     userId,
                     status.user.screen_name,
                     'type_mention',
-                    status.text,
+                    entities.decode(status.text),
                     status.user.profile_image_url
                 );
             }
@@ -37,7 +39,7 @@ module.exports = {
                 userId,
                 dm.direct_message.sender.screen_name,
                 'type_direct_message',
-                null, //dm.direct_message.text,
+                entities.decode(dm.direct_message.text),
                 dm.direct_message.sender.profile_image_url
             );
         });
@@ -62,7 +64,7 @@ module.exports = {
                     userId,
                     event.source.screen_name,
                     'type_favorite',
-                    event.target_object.text,
+                    entities.decode(event.target_object.text),
                     event.source.profile_image_url
                 );
             }
