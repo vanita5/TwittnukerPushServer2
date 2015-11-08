@@ -34,7 +34,6 @@ var initTwitterInstances = function() {
     }
     else if (db('tokens').size() == 0) {
         console.info("No device registered. Please setup Twittnuker to receive Push Notifications from this server!");
-        return;
     }
 
     config.twitter.forEach(function(profile) {
@@ -51,15 +50,15 @@ var initTwitterInstances = function() {
             stream = T.stream('user');
             stream.on('connect', function() {streamhandler.streamHandler(stream, data.id_str)});
             userId = data.id_str;
+
+            var instance = {
+                twit: T,
+                stream: stream,
+                userId: userId
+            };
+
+            twitter.instances.push(instance);
         });
-
-        var instance = {
-            twit: T,
-            stream: stream,
-            userId: userId
-        };
-
-        twitter.instances.push(instance);
     });
 };
 
