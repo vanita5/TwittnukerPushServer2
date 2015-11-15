@@ -117,7 +117,7 @@ module.exports = {
                     url.display_url +
                     text.substring(url.indices[1]);
             });
-            return htmlEntities.decode(text);
+            return htmlEntities.decode(text.replace(/\r?\n|\r/g, ' '));
         };
 
         var isMyRetweet = function(status, userId) {
