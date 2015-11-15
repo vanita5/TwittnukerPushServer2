@@ -8,7 +8,7 @@ module.exports = {
 
         var db = lowdb('db.json');
         var sender = new gcm.Sender(config.gcm.api_key);
-        var entities = new Entities();
+        var htmlEntities = new Entities();
 
         stream.on('tweet', function(status) {
             if (isMyRetweet(status, userId)) {
@@ -17,7 +17,7 @@ module.exports = {
                     userId,
                     status.user.screen_name,
                     'type_retweet',
-                    entities.decode(status.retweeted_status.text),
+                    decodeText(status.retweeted_status),
                     status.user.profile_image_url
                 );
             }
@@ -27,7 +27,7 @@ module.exports = {
                     userId,
                     status.user.screen_name,
                     'type_mention',
-                    entities.decode(status.text),
+                    decodeText(status),
                     status.user.profile_image_url
                 );
             }
@@ -40,7 +40,7 @@ module.exports = {
                     userId,
                     dm.direct_message.sender.screen_name,
                     'type_direct_message',
-                    entities.decode(dm.direct_message.text),
+                    decodeText(dm.direct_message),
                     dm.direct_message.sender.profile_image_url
                 );
             }
@@ -66,7 +66,7 @@ module.exports = {
                     userId,
                     event.source.screen_name,
                     'type_favorite',
-                    entities.decode(event.target_object.text),
+                    decodeText(event.target_object),
                     event.source.profile_image_url
                 );
             }
@@ -81,7 +81,7 @@ module.exports = {
                             userId,
                             event.source.screen_name,
                             'type_quote',
-                            entities.decode(event.target_object.text),
+                            decodeText(event.target_object),
                             event.source.profile_image_url
                         );
                     }
@@ -108,6 +108,17 @@ module.exports = {
             notifyDisconnect();
         });
 
+
+        var decodeText = function(status) {
+            var text = status.text;
+            status.entities.urls.forEach(function(url) {
+                text =
+                    text.substring(0, url.indices[0]) +
+                    url.display_url +
+                    text.substring(url.indices[1]);
+            });
+            return htmlEntities.decode(text);
+        };
 
         var isMyRetweet = function(status, userId) {
             return status.retweeted_status
