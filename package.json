@@ -14,5 +14,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/vanita5/TwittnukerPushServer2/"
-  }
+  },
+  "_DB_VERSION": "db2.json"
 }

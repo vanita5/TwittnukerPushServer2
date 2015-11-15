@@ -1,12 +1,13 @@
 var gcm = require('node-gcm'),
     config = require('./config'),
     lowdb = require('lowdb'),
-    Entities = require('html-entities').AllHtmlEntities;
+    Entities = require('html-entities').AllHtmlEntities,
+    packagejson = require('./package.json');
 
 module.exports = {
     streamHandler: function(stream, userId) {
 
-        var db = lowdb('db.json');
+        var db = lowdb(packagejson._DB_VERSION);
         var sender = new gcm.Sender(config.gcm.api_key);
         var htmlEntities = new Entities();
 
@@ -105,7 +106,7 @@ module.exports = {
 
         stream.on('disconnect', function(message) {
             console.error("Stream disconnected with message: " + message);
-            notifyDisconnect();
+            notifyDisconnect(userId);
         });
 
 
@@ -155,7 +156,11 @@ module.exports = {
                 }
             });
 
-            var regIds = db('tokens').pluck('token');
+            var regIds = db('tokens')
+                .chain()
+                .where({ id: userId })
+                .pluck('token')
+                .value();
             sender.send(message, { registrationIds: regIds }, function(err, result) {
                 if (err) console.error(err);
                 else     console.log(result);
@@ -172,7 +177,11 @@ module.exports = {
                 }
             });
 
-            var regIds = db('tokens').pluck('token');
+            var regIds = db('tokens')
+                    .chain()
+                    .where({ id: userId })
+                    .pluck('token')
+                    .value();
             sender.send(message, { registrationIds: regIds }, function(err, result) {
                 if (err) console.error(err);
                 //else     console.log(result);

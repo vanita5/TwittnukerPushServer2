@@ -2,7 +2,8 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     twit = require('twit'),
     lowdb = require('lowdb'),
-    streamhandler = require('./handler');
+    streamhandler = require('./handler'),
+    packagejson = require('./package.json');
 
 try {
     var config = require('./config');
@@ -21,7 +22,7 @@ var app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-var db = lowdb('db.json');
+var db = lowdb(packagejson._DB_VERSION);
 
 var twitter = {
     instances: []
@@ -93,8 +94,17 @@ app.post('/register', function(req, res) {
         twitter.instances.forEach(function(instance) {
             if (instance.userId == twitterUserId) isConfigured = true;
         });
-        if (isConfigured && !db('tokens').find({ token: token })) {
-            db('tokens').push({token: token});
+        if (isConfigured && !db('tokens').find({ id: twitterUserId, token: token })) {
+            if (db('tokens').find({ id: twitterUserId })) {
+                db('tokens')
+                    .chain()
+                    .find({ id: twitterUserId })
+                    .value()
+                    .tokens
+                    .push(token);
+            } else {
+                db('tokens').push({id: twitterUserId, tokens: [token]});
+            }
             updateTwitterInstances();
 
             res.set('Content-Type', 'application/json');

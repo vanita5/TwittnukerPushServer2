@@ -3,5 +3,5 @@ node_modules/
 .idea/
 
 config.js
-db.json
+db*.json
 npm-debug.log
