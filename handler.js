@@ -34,14 +34,16 @@ module.exports = {
         });
 
         stream.on('direct_message', function (dm) {
-            console.info('DM from ' + dm.direct_message.sender.screen_name);
-            notify(
-                userId,
-                dm.direct_message.sender.screen_name,
-                'type_direct_message',
-                entities.decode(dm.direct_message.text),
-                dm.direct_message.sender.profile_image_url
-            );
+            if (!isDMFromMe(dm, userId)) {
+                console.info('DM from ' + dm.direct_message.sender.screen_name);
+                notify(
+                    userId,
+                    dm.direct_message.sender.screen_name,
+                    'type_direct_message',
+                    entities.decode(dm.direct_message.text),
+                    dm.direct_message.sender.profile_image_url
+                );
+            }
         });
 
         stream.on('follow', function (event) {
@@ -99,6 +101,10 @@ module.exports = {
                 if (mention.id_str == userId) result = true;
             });
             return result;
+        };
+
+        var isDMFromMe = function(dm, userId) {
+            return dm.direct_message.sender.id_str == userId;
         };
 
         var isMyEvent = function(event, userId) {
