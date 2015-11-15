@@ -72,6 +72,25 @@ module.exports = {
             }
         });
 
+        stream.on('user_event', function (event) {
+            switch (event.event) {
+                case 'quoted_tweet':
+                    if (isMyEvent(event, userId)) {
+                        console.info('Quoted by ' + event.source.screen_name);
+                        notify(
+                            userId,
+                            event.source.screen_name,
+                            'type_quote',
+                            entities.decode(event.target_object.text),
+                            event.source.profile_image_url
+                        );
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
+
         stream.on('connect', function (request) {
             console.info("Connecting to connect to user stream...");
         });
