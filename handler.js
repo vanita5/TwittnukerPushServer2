@@ -159,8 +159,8 @@ module.exports = {
             var regIds = db('tokens')
                 .chain()
                 .where({ id: userId })
-                .pluck('token')
-                .value();
+                .pluck('tokens')
+                .value()[0];
             sender.send(message, { registrationIds: regIds }, function(err, result) {
                 if (err) console.error(err);
                 //else     console.log(result);
@@ -178,10 +178,10 @@ module.exports = {
             });
 
             var regIds = db('tokens')
-                    .chain()
-                    .where({ id: userId })
-                    .pluck('token')
-                    .value();
+                .chain()
+                .where({ id: userId })
+                .pluck('tokens')
+                .value()[0];
             sender.send(message, { registrationIds: regIds }, function(err, result) {
                 if (err) console.error(err);
                 //else     console.log(result);
