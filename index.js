@@ -22,7 +22,10 @@ var app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-var db = lowdb(packagejson._DB_VERSION);
+var db = lowdb(packagejson._DB_VERSION, {
+    autosave: true,
+    async: false
+});
 
 var twitter = {
     instances: []
