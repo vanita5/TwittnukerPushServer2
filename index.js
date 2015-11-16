@@ -111,9 +111,11 @@ app.post('/register', function(req, res) {
                         .value()
                         .tokens
                         .push(token);
+                    db.saveSync();
                 }
             } else {
                 db('tokens').push({id: twitterUserId, tokens: [token]});
+                db.saveSync();
             }
             updateTwitterInstances();
 
