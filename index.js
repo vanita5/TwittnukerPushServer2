@@ -94,14 +94,21 @@ app.post('/register', function(req, res) {
         twitter.instances.forEach(function(instance) {
             if (instance.userId == twitterUserId) isConfigured = true;
         });
-        if (isConfigured && !db('tokens').find({ id: twitterUserId, token: token })) {
+        if (isConfigured) {
             if (db('tokens').find({ id: twitterUserId })) {
-                db('tokens')
+                if (!db('tokens')
                     .chain()
                     .find({ id: twitterUserId })
                     .value()
                     .tokens
-                    .push(token);
+                    .indexOf(token) >= 0) {
+                    db('tokens')
+                        .chain()
+                        .find({ id: twitterUserId })
+                        .value()
+                        .tokens
+                        .push(token);
+                }
             } else {
                 db('tokens').push({id: twitterUserId, tokens: [token]});
             }
