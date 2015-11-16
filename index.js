@@ -139,11 +139,12 @@ app.post('/remove', function(req, res) {
 
     var elements = db('tokens').value();
     elements.forEach(function(el) {
-        var idx = el.tokens.indexOf("d01rOQJf5GY:APA91bH_7l8y4yj45ljGqLhzQxKdjMQgPGRPYgXyXZSfH12zOH_DBSvEDWQre4UWc0vRPeiaTeI22aEMIthLT-iB_9J6QN4tl6387DndwHS5Lc54mEsEssuqnrdYj7nfW2fBFeIWCoHL");
+        var idx = el.tokens.indexOf(token);
         if (idx > -1) {
             el.tokens = el.tokens.splice(idx, 1);
         }
     });
+    db.saveSync();
 
     updateTwitterInstances();
 
