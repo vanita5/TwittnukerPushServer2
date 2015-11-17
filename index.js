@@ -141,7 +141,7 @@ app.post('/remove', function(req, res) {
     elements.forEach(function(el) {
         var idx = el.tokens.indexOf(token);
         if (idx > -1) {
-            el.tokens = el.tokens.splice(idx, 1);
+            el.tokens.splice(idx, 1);
         }
     });
     db.saveSync();
