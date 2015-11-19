@@ -19,7 +19,9 @@ module.exports = {
                     status.user.screen_name,
                     'type_retweet',
                     decodeText(status.retweeted_status),
-                    status.user.profile_image_url
+                    status.user.profile_image_url,
+                    status.retweeted_status.id,
+                    status.user.id
                 );
             }
             else if (isMention(status, userId)) {
@@ -29,7 +31,9 @@ module.exports = {
                     status.user.screen_name,
                     'type_mention',
                     decodeText(status),
-                    status.user.profile_image_url
+                    status.user.profile_image_url,
+                    status.id,
+                    status.user.id
                 );
             }
         });
@@ -42,7 +46,9 @@ module.exports = {
                     dm.direct_message.sender.screen_name,
                     'type_direct_message',
                     decodeText(dm.direct_message),
-                    dm.direct_message.sender.profile_image_url
+                    dm.direct_message.sender.profile_image_url,
+                    dm.direct_message.id,
+                    dm.direct_message.sender.id
                 );
             }
         });
@@ -55,7 +61,9 @@ module.exports = {
                     event.source.screen_name,
                     'type_new_follower',
                     null,
-                    event.source.profile_image_url
+                    event.source.profile_image_url,
+                    null,
+                    event.source.id
                 );
             }
         });
@@ -68,7 +76,9 @@ module.exports = {
                     event.source.screen_name,
                     'type_favorite',
                     decodeText(event.target_object),
-                    event.source.profile_image_url
+                    event.source.profile_image_url,
+                    event.target_object.id,
+                    event.source.id
                 );
             }
         });
@@ -83,7 +93,9 @@ module.exports = {
                             event.source.screen_name,
                             'type_quote',
                             decodeText(event.target_object),
-                            event.source.profile_image_url
+                            event.source.profile_image_url,
+                            event.target_object.id,
+                            event.source.id
                         );
                     }
                     break;
@@ -142,7 +154,7 @@ module.exports = {
             return event.source.id_str != userId;
         };
 
-        var notify = function(userId, fromuser, type, msg, image_url) {
+        var notify = function(userId, fromuser, type, msg, image_url, object_id, object_user_id) {
             var message = new gcm.Message({
                 priority: "high",
                 delayWhileIdle: false,
@@ -152,7 +164,9 @@ module.exports = {
                     fromuser: fromuser,
                     type: type,
                     msg: msg,
-                    image: image_url
+                    image: image_url,
+                    object_id: object_id,
+                    object_user_id: object_user_id
                 }
             });
 
