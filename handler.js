@@ -20,8 +20,8 @@ module.exports = {
                     'type_retweet',
                     decodeText(status.retweeted_status),
                     status.user.profile_image_url,
-                    status.retweeted_status.id,
-                    status.user.id
+                    status.retweeted_status.id_str,
+                    status.user.id_str
                 );
             }
             else if (isMention(status, userId)) {
@@ -32,8 +32,8 @@ module.exports = {
                     'type_mention',
                     decodeText(status),
                     status.user.profile_image_url,
-                    status.id,
-                    status.user.id
+                    status.id_str,
+                    status.user.id_str
                 );
             }
         });
@@ -47,8 +47,8 @@ module.exports = {
                     'type_direct_message',
                     decodeText(dm.direct_message),
                     dm.direct_message.sender.profile_image_url,
-                    dm.direct_message.id,
-                    dm.direct_message.sender.id
+                    dm.direct_message.id_str,
+                    dm.direct_message.sender.id_str
                 );
             }
         });
@@ -63,7 +63,7 @@ module.exports = {
                     null,
                     event.source.profile_image_url,
                     null,
-                    event.source.id
+                    event.source.id_str
                 );
             }
         });
@@ -77,8 +77,8 @@ module.exports = {
                     'type_favorite',
                     decodeText(event.target_object),
                     event.source.profile_image_url,
-                    event.target_object.id,
-                    event.source.id
+                    event.target_object.id_str,
+                    event.source.id_str
                 );
             }
         });
@@ -94,8 +94,8 @@ module.exports = {
                             'type_quote',
                             decodeText(event.target_object),
                             event.source.profile_image_url,
-                            event.target_object.id,
-                            event.source.id
+                            event.target_object.id_str,
+                            event.source.id_str
                         );
                     }
                     break;
