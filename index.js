@@ -3,6 +3,7 @@ var express = require('express'),
     twit = require('twit'),
     lowdb = require('lowdb'),
     streamhandler = require('./handler'),
+    gcm = require('node-gcm'),
     packagejson = require('./package.json');
 
 try {
@@ -74,6 +75,22 @@ var updateTwitterInstances = function() {
     initTwitterInstances();
 };
 
+var sendSuccessNotification = function(regID) {
+    var sender = new gcm.Sender(config.gcm.api_key);
+    var message = new gcm.Message({
+        restrictedPackageName: "de.vanita5.twittnuker",
+        notification: {
+            title: "Twittnuker",
+            icon: "ic_action_twittnuker",
+            body: "Success! This is a test message."
+        }
+    });
+    sender.send(message, { registrationIds: [ regID ] }, function(err, result) {
+        if (err) console.error(err);
+        //else     console.log(result);
+    });
+};
+
 /**
  *
  */
@@ -118,6 +135,7 @@ app.post('/register', function(req, res) {
                 db.saveSync();
             }
             updateTwitterInstances();
+            sendSuccessNotification(token);
 
             res.set('Content-Type', 'application/json');
             res.send('{ "status": "Ok" }');
