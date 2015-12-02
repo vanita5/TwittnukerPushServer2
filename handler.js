@@ -5,7 +5,7 @@ var gcm = require('node-gcm'),
     packagejson = require('./package.json');
 
 module.exports = {
-    streamHandler: function(stream, userId) {
+    streamHandler: function(stream, userId, logger) {
 
         var db = lowdb(packagejson._DB_VERSION);
         var sender = new gcm.Sender(config.gcm.api_key);
@@ -13,7 +13,7 @@ module.exports = {
 
         stream.on('tweet', function(status) {
             if (isMyRetweet(status, userId)) {
-                console.info('Retweet from ' + status.user.screen_name);
+                logger.info('Retweet from ' + status.user.screen_name);
                 notify(
                     userId,
                     status.user.screen_name,
@@ -25,7 +25,7 @@ module.exports = {
                 );
             }
             else if (isMention(status, userId)) {
-                console.info('Mention from ' + status.user.screen_name);
+                logger.info('Mention from ' + status.user.screen_name);
                 notify(
                     userId,
                     status.user.screen_name,
@@ -40,7 +40,7 @@ module.exports = {
 
         stream.on('direct_message', function (dm) {
             if (!isDMFromMe(dm, userId)) {
-                console.info('DM from ' + dm.direct_message.sender.screen_name);
+                logger.info('DM from ' + dm.direct_message.sender.screen_name);
                 notify(
                     userId,
                     dm.direct_message.sender.screen_name,
@@ -55,7 +55,7 @@ module.exports = {
 
         stream.on('follow', function (event) {
             if (isMyEvent(event, userId)) {
-                console.log('Follow from ' + event.source.screen_name);
+                logger.log('Follow from ' + event.source.screen_name);
                 notify(
                     userId,
                     event.source.screen_name,
@@ -70,7 +70,7 @@ module.exports = {
 
         stream.on('favorite', function (event) {
             if (isMyEvent(event, userId)) {
-                console.log('Like from ' + event.source.screen_name);
+                logger.log('Like from ' + event.source.screen_name);
                 notify(
                     userId,
                     event.source.screen_name,
@@ -87,7 +87,7 @@ module.exports = {
             switch (event.event) {
                 case 'quoted_tweet':
                     if (isMyEvent(event, userId)) {
-                        console.info('Quoted by ' + event.source.screen_name);
+                        logger.info('Quoted by ' + event.source.screen_name);
                         notify(
                             userId,
                             event.source.screen_name,
@@ -105,19 +105,19 @@ module.exports = {
         });
 
         stream.on('connect', function (request) {
-            console.info("Connecting to connect to user stream...");
+            logger.info("Connecting to connect to user stream...");
         });
 
         stream.on('connected', function (response) {
-            console.info("User stream connected.")
+            logger.info("User stream connected.")
         });
 
         stream.on('reconnect', function (request, response, connectInterval) {
-            console.info("Reconnecting to user stream...")
+            logger.info("Reconnecting to user stream...")
         });
 
         stream.on('disconnect', function(message) {
-            console.error("Stream disconnected with message: " + message);
+            logger.error("Stream disconnected with message: " + message);
             notifyDisconnect(userId);
         });
 
@@ -176,8 +176,8 @@ module.exports = {
                 .pluck('tokens')
                 .value()[0];
             sender.send(message, { registrationIds: regIds }, function(err, result) {
-                if (err) console.error(err);
-                //else     console.log(result);
+                if (err) logger.error(err);
+                //else     logger.log(result);
             });
         };
 
@@ -197,8 +197,8 @@ module.exports = {
                 .pluck('tokens')
                 .value()[0];
             sender.send(message, { registrationIds: regIds }, function(err, result) {
-                if (err) console.error(err);
-                //else     console.log(result);
+                if (err) logger.error(err);
+                //else     logger.log(result);
             });
         };
     }

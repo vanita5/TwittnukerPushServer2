@@ -4,14 +4,24 @@ var express = require('express'),
     lowdb = require('lowdb'),
     streamhandler = require('./handler'),
     gcm = require('node-gcm'),
-    packagejson = require('./package.json');
+    packagejson = require('./package.json'),
+    winston = require('winston');
+
+var logger = new (winston.Logger)({
+    transports: [
+        new (winston.transports.Console)(),
+        new (winston.transports.File)({
+            filename: 'main.log'
+        })
+    ]
+});
 
 try {
     var config = require('./config');
     if (!config.gcm || !config.twitter) throw "config file corrupted";
 } catch (error) {
-    console.error(error);
-    console.error(
+    logger.error(error);
+    logger.error(
         "Error loading config file.\n" +
         "\n" +
         "Please copy config_example.js to config.js and edit accordingly!"
@@ -34,11 +44,11 @@ var twitter = {
 
 var initTwitterInstances = function() {
     if (config.twitter.length == 0) {
-        console.error("No Twitter configurations. Please edit config.js accordingly!");
+        logger.error("No Twitter configurations. Please edit config.js accordingly!");
         return;
     }
     else if (db('tokens').size() == 0) {
-        console.info("No device registered. Please setup Twittnuker to receive Push Notifications from this server!");
+        logger.info("No device registered. Please setup Twittnuker to receive Push Notifications from this server!");
     }
 
     config.twitter.forEach(function(profile) {
@@ -53,7 +63,7 @@ var initTwitterInstances = function() {
         var userId = null;
         T.get('account/verify_credentials', { skip_status: true }, function (err, data, response) {
             stream = T.stream('user');
-            stream.on('connect', function() {streamhandler.streamHandler(stream, data.id_str)});
+            stream.on('connect', function() {streamhandler.streamHandler(stream, data.id_str, logger)});
             userId = data.id_str;
 
             var instance = {
@@ -86,8 +96,8 @@ var sendSuccessNotification = function(regID) {
         }
     });
     sender.send(message, { registrationIds: [ regID ] }, function(err, result) {
-        if (err) console.error(err);
-        //else     console.log(result);
+        if (err) logger.error(err);
+        //else     logger.log(result);
     });
 };
 
@@ -106,7 +116,7 @@ app.post('/register', function(req, res) {
     var token = req.body.token;
     var twitterUserId = req.body.userId;
 
-    console.log('Register: ' + token);
+    logger.log('Register: ' + token);
 
     //Wait 5s -
     setTimeout(function() {
@@ -153,7 +163,7 @@ app.post('/register', function(req, res) {
 app.post('/remove', function(req, res) {
     var token = req.body.token;
 
-    console.log('Remove: ' + token);
+    logger.log('Remove: ' + token);
 
     var elements = db('tokens').value();
     elements.forEach(function(el) {
@@ -177,6 +187,6 @@ var server = app.listen(7331, function() {
     var host = server.address().address;
     var port = server.address().port;
 
-    console.info('Twittnuker Push running at http://%s:%s', host, port);
+    logger.info('Twittnuker Push running at http://%s:%s', host, port);
 });
 updateTwitterInstances();
