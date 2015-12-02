@@ -11,7 +11,8 @@ var logger = new (winston.Logger)({
     transports: [
         new (winston.transports.Console)(),
         new (winston.transports.File)({
-            filename: 'main.log'
+            filename: 'main.log',
+            level: 'silly'
         })
     ]
 });
@@ -43,6 +44,7 @@ var twitter = {
 };
 
 var initTwitterInstances = function() {
+    logger.log('debug', "called initTwitterInstances");
     if (config.twitter.length == 0) {
         logger.error("No Twitter configurations. Please edit config.js accordingly!");
         return;
@@ -72,6 +74,7 @@ var initTwitterInstances = function() {
                 userId: userId
             };
 
+            logger.log('debug', "Added Twitter instance", { instance: instance });
             twitter.instances.push(instance);
         });
     });
@@ -190,3 +193,7 @@ var server = app.listen(7331, function() {
     logger.info('Twittnuker Push running at http://%s:%s', host, port);
 });
 updateTwitterInstances();
+setInterval(function() {
+    //Log twitter instances
+    logger.log('silly', "Twitter instances: " + twitter.instances.length, { twitter: twitter.instances });
+}, 1000*60*60*3); //every 3h
