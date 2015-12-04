@@ -5,7 +5,9 @@ var gcm = require('node-gcm'),
     packagejson = require('./package.json');
 
 module.exports = {
-    streamHandler: function(stream, userId, logger) {
+    streamHandler: function(T, userId, logger) {
+
+        var stream = T.stream('user');
 
         var db = lowdb(packagejson._DB_VERSION);
         var sender = new gcm.Sender(config.gcm.api_key);
@@ -105,7 +107,7 @@ module.exports = {
         });
 
         stream.on('connect', function (request) {
-            logger.info("Connecting to connect to user stream...");
+            logger.info("Connect to user stream...");
         });
 
         stream.on('connected', function (response) {

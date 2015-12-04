@@ -64,8 +64,7 @@ var initTwitterInstances = function() {
         var stream = null;
         var userId = null;
         T.get('account/verify_credentials', { skip_status: true }, function (err, data, response) {
-            stream = T.stream('user');
-            stream.on('connect', function() {streamhandler.streamHandler(stream, data.id_str, logger)});
+            stream = streamhandler.streamHandler(T, data.id_str, logger);
             userId = data.id_str;
 
             var instance = {
