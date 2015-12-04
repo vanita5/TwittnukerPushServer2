@@ -194,5 +194,5 @@ var server = app.listen(7331, function() {
 updateTwitterInstances();
 setInterval(function() {
     //Log twitter instances
-    logger.log('silly', "Twitter instances: " + twitter.instances.length, { twitter: twitter.instances });
+    logger.log('silly', "Twitter instances: " + twitter.instances.length);
 }, 1000*60*60*3); //every 3h
