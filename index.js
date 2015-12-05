@@ -119,7 +119,7 @@ app.post('/register', function(req, res) {
     var token = req.body.token;
     var twitterUserId = req.body.userId;
 
-    logger.log('Register: ' + token);
+    logger.info('Register: ' + token);
 
     //Wait 5s -
     setTimeout(function() {
@@ -166,7 +166,7 @@ app.post('/register', function(req, res) {
 app.post('/remove', function(req, res) {
     var token = req.body.token;
 
-    logger.log('Remove: ' + token);
+    logger.info('Remove: ' + token);
 
     var elements = db('tokens').value();
     elements.forEach(function(el) {
