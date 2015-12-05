@@ -5,15 +5,19 @@ var gcm = require('node-gcm'),
     packagejson = require('./package.json');
 
 module.exports = {
+    stream: null,
+    stop: function() {
+        if (this.stream) this.stream.stop();
+    },
     streamHandler: function(T, userId, logger) {
 
-        var stream = T.stream('user');
+        this.stream = T.stream('user');
 
         var db = lowdb(packagejson._DB_VERSION);
         var sender = new gcm.Sender(config.gcm.api_key);
         var htmlEntities = new Entities();
 
-        stream.on('tweet', function(status) {
+        this.stream.on('tweet', function(status) {
             if (isMyRetweet(status, userId)) {
                 logger.info('Retweet from ' + status.user.screen_name);
                 notify(
@@ -40,7 +44,7 @@ module.exports = {
             }
         });
 
-        stream.on('direct_message', function (dm) {
+        this.stream.on('direct_message', function (dm) {
             if (!isDMFromMe(dm, userId)) {
                 logger.info('DM from ' + dm.direct_message.sender.screen_name);
                 notify(
@@ -55,7 +59,7 @@ module.exports = {
             }
         });
 
-        stream.on('follow', function (event) {
+        this.stream.on('follow', function (event) {
             if (isMyEvent(event, userId)) {
                 logger.log('Follow from ' + event.source.screen_name);
                 notify(
@@ -70,7 +74,7 @@ module.exports = {
             }
         });
 
-        stream.on('favorite', function (event) {
+        this.stream.on('favorite', function (event) {
             if (isMyEvent(event, userId)) {
                 logger.log('Like from ' + event.source.screen_name);
                 notify(
@@ -85,7 +89,7 @@ module.exports = {
             }
         });
 
-        stream.on('user_event', function (event) {
+        this.stream.on('user_event', function (event) {
             switch (event.event) {
                 case 'quoted_tweet':
                     if (isMyEvent(event, userId)) {
@@ -106,19 +110,19 @@ module.exports = {
             }
         });
 
-        stream.on('connect', function (request) {
+        this.stream.on('connect', function (request) {
             logger.info("Connect to user stream...");
         });
 
-        stream.on('connected', function (response) {
+        this.stream.on('connected', function (response) {
             logger.info("User stream connected.")
         });
 
-        stream.on('reconnect', function (request, response, connectInterval) {
+        this.stream.on('reconnect', function (request, response, connectInterval) {
             logger.info("Reconnecting to user stream...")
         });
 
-        stream.on('disconnect', function(message) {
+        this.stream.on('disconnect', function(message) {
             logger.error("Stream disconnected with message: " + message);
             notifyDisconnect(userId);
         });
