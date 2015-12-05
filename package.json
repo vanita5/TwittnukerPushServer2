@@ -1,7 +1,7 @@
 {
   "name": "TwittnukerPushServer2",
   "description": "Twittnuker Push Notification Server",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "GPL-3.0",
   "dependencies": {
     "node-gcm": "0.12.0",
