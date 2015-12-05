@@ -2,7 +2,7 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     twit = require('twit'),
     lowdb = require('lowdb'),
-    streamhandler = require('./handler'),
+    StreamHandler = require('./handler'),
     gcm = require('node-gcm'),
     packagejson = require('./package.json'),
     winston = require('winston');
@@ -64,7 +64,8 @@ var initTwitterInstances = function() {
         var stream = null;
         var userId = null;
         T.get('account/verify_credentials', { skip_status: true }, function (err, data, response) {
-            stream = streamhandler.streamHandler(T, data.id_str, logger);
+            stream = new StreamHandler(T, data.id_str, logger);
+            stream.start();
             userId = data.id_str;
 
             var instance = {
