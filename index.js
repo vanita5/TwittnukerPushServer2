@@ -119,7 +119,7 @@ app.post('/register', function(req, res) {
     var token = req.body.token;
     var twitterUserId = req.body.userId;
 
-    logger.info('Register: ' + token);
+    logger.info('Register: ' + token + ' for Twitter User ' + twitterUserId);
 
     //Wait 5s -
     setTimeout(function() {

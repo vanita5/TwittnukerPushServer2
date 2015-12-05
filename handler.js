@@ -70,7 +70,7 @@ StreamHandler.prototype.start = function() {
 
     this.stream.on('follow', function (event) {
         if (isMyEvent(event, userId)) {
-            logger.log('Follow from ' + event.source.screen_name);
+            logger.info('Follow from ' + event.source.screen_name);
             notify(
                 userId,
                 event.source.screen_name,
@@ -85,7 +85,7 @@ StreamHandler.prototype.start = function() {
 
     this.stream.on('favorite', function (event) {
         if (isMyEvent(event, userId)) {
-            logger.log('Like from ' + event.source.screen_name);
+            logger.info('Like from ' + event.source.screen_name);
             notify(
                 userId,
                 event.source.screen_name,
@@ -213,7 +213,7 @@ StreamHandler.prototype.start = function() {
             .value()[0];
         sender.send(message, { registrationIds: regIds }, function(err, result) {
             if (err) logger.error(err);
-            //else     logger.log(result);
+            //else     logger.info(result);
         });
     };
 };
